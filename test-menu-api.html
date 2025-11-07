@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu API Test</title>
+</head>
+<body>
+    <h1>Menu API Test</h1>
+    <button onclick="testMenuAPI()">Test Menu API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testMenuAPI() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                resultDiv.innerHTML = 'Testing Menu API...';
+                
+                // Test getting menu for Monday (day 1)
+                const response = await fetch('http://localhost/smart-canteen-api/api/menu.php?day=1', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const responseText = await response.text();
+                resultDiv.innerHTML = `<h3>Response Status: ${response.status}</h3>`;
+                resultDiv.innerHTML += `<h3>Response Body:</h3><pre>${responseText}</pre>`;
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(responseText);
+                    if (data.success) {
+                        resultDiv.innerHTML += '<div style="color: green; font-weight: bold;">✅ MENU API WORKING!</div>';
+                        resultDiv.innerHTML += `<div>Found ${data.items ? data.items.length : 0} menu items</div>`;
+                    } else {
+                        resultDiv.innerHTML += '<div style="color: red; font-weight: bold;">❌ Menu API failed: ' + data.message + '</div>';
+                    }
+                } catch (e) {
+                    resultDiv.innerHTML += '<div style="color: red; font-weight: bold;">❌ Response is not valid JSON</div>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

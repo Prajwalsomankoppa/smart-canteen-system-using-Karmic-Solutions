@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>CORS Test</h1>
+    <button onclick="testCORS()">Test CORS</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCORS() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                resultDiv.innerHTML = 'Testing Login API...';
+                
+                const response = await fetch('http://localhost/smart-canteen-api/api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        employee_id: 'EMP001',
+                        password: '1234'
+                    })
+                });
+                
+                const responseText = await response.text();
+                resultDiv.innerHTML = `<h3>Response Status: ${response.status}</h3>`;
+                resultDiv.innerHTML += `<h3>Response Headers:</h3><pre>${JSON.stringify([...response.headers.entries()], null, 2)}</pre>`;
+                resultDiv.innerHTML += `<h3>Response Body:</h3><pre>${responseText}</pre>`;
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(responseText);
+                    if (data.success) {
+                        resultDiv.innerHTML += '<div style="color: green; font-weight: bold;">✅ LOGIN API WORKING!</div>';
+                    } else {
+                        resultDiv.innerHTML += '<div style="color: red; font-weight: bold;">❌ Login failed: ' + data.message + '</div>';
+                    }
+                } catch (e) {
+                    resultDiv.innerHTML += '<div style="color: red; font-weight: bold;">❌ Response is not valid JSON</div>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
